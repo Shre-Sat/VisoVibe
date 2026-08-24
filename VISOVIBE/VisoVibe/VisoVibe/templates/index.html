@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocalSense AI</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, #172554, transparent 35%),
+                radial-gradient(circle at bottom right, #312e81, transparent 35%),
+                #050816;
+            color: white;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo { display: flex; align-items: center; gap: 12px; }
+
+        .logo-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: linear-gradient(135deg, #6366f1, #06b6d4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; box-shadow: 0 0 25px rgba(99,102,241,0.5);
+        }
+
+        .logo h1 { font-size: 24px; }
+        .logo p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+
+        .live-badge {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.35);
+            padding: 9px 15px; border-radius: 30px;
+            color: #fca5a5; font-size: 13px;
+        }
+
+        .live-dot {
+            width: 8px; height: 8px; background: #ef4444;
+            border-radius: 50%; box-shadow: 0 0 12px #ef4444;
+        }
+
+        .hero { margin-bottom: 25px; }
+        .hero h2 { font-size: 32px; margin-bottom: 8px; }
+        .hero p { color: #94a3b8; }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 22px;
+        }
+
+        .card {
+            background: rgba(15,23,42,0.72);
+            border: 1px solid rgba(148,163,184,0.15);
+            border-radius: 22px; padding: 22px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        }
+
+        .card-title {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .card-title h3 { font-size: 17px; }
+        .small-status { color: #22c55e; font-size: 12px; }
+
+        .camera-box {
+            position: relative; height: 390px;
+            background: #020617; border-radius: 16px;
+            overflow: hidden; border: 1px solid #1e293b;
+        }
+
+        .camera-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .camera-label {
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(0,0,0,0.55);
+            padding: 7px 12px; border-radius: 20px; font-size: 12px;
+        }
+
+        .prediction-card {
+            display: flex; flex-direction: column; justify-content: center;
+            min-height: 260px;
+        }
+
+        .prediction-label { color: #94a3b8; font-size: 13px; margin-bottom: 10px; }
+
+        #word {
+            font-size: 46px; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(90deg, #818cf8, #22d3ee);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 22px; text-transform: uppercase;
+        }
+
+        .confidence-row {
+            display: flex; justify-content: space-between;
+            margin-bottom: 8px; font-size: 13px;
+        }
+
+        #confidence { color: #67e8f9; font-weight: bold; }
+
+        .progress {
+            height: 9px; background: #1e293b; border-radius: 20px; overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%; width: 0%; border-radius: 20px;
+            transition: 0.2s; background: linear-gradient(90deg, #6366f1, #06b6d4);
+            box-shadow: 0 0 15px rgba(6,182,212,0.5);
+        }
+
+        .status-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 22px; margin-top: 22px;
+        }
+
+        .status-icon {
+            width: 44px; height: 44px; border-radius: 13px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 21px; margin-bottom: 18px;
+        }
+
+        .purple { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25); }
+        .cyan { background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.25); }
+
+        .status-card h3 { font-size: 15px; margin-bottom: 10px; }
+        .status-text { color: #22c55e; font-size: 13px; margin-bottom: 12px; }
+        .status-text.alert { color: #f87171; }
+
+        .depth-thumb {
+            width: 100%; border-radius: 10px; margin-top: 4px; display: block;
+        }
+
+        footer { text-align: center; color: #475569; font-size: 12px; margin-top: 25px; }
+
+        @media(max-width: 800px) {
+            body { padding: 18px; }
+            .main-grid { grid-template-columns: 1fr; }
+            .camera-box { height: 300px; }
+            .hero h2 { font-size: 25px; }
+            .status-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🧠</div>
+            <div>
+                <h1>VocalSense AI</h1>
+                <p>Silent Speech Communication System</p>
+            </div>
+        </div>
+        <div class="live-badge">
+            <span class="live-dot"></span>
+            LIVE SYSTEM
+        </div>
+    </header>
+
+    <div class="hero">
+        <h2>Real-Time Speech Assistant</h2>
+        <p>Multimodal AI interface for silent speech recognition</p>
+    </div>
+
+    <div class="main-grid">
+
+        <div class="card">
+            <div class="card-title">
+                <h3>📷 Live Camera Feed</h3>
+                <span class="small-status">● Camera Live</span>
+            </div>
+            <div class="camera-box">
+                <img src="{{ url_for('camera_feed') }}" alt="live camera feed with lip landmarks" />
+                <div class="camera-label">FACE / LIP TRACKING</div>
+            </div>
+        </div>
+
+        <div class="card prediction-card">
+            <div class="card-title">
+                <h3>🗣️ Speech Prediction</h3>
+                <span class="small-status">AI READY</span>
+            </div>
+            <div class="prediction-label">DETECTED WORD</div>
+            <div id="word">...</div>
+            <div class="confidence-row">
+                <span>Fused Confidence</span>
+                <span id="confidence">0%</span>
+            </div>
+            <div class="progress">
+                <div id="progressBar" class="progress-fill"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="status-grid">
+
+        <div class="card status-card">
+            <div class="status-icon purple">〰️</div>
+            <h3>Throat Vibration <span style="color:#e0c07e; font-size:11px;">(simulated via mic)</span></h3>
+            <div class="status-text" id="vib-status">● Listening</div>
+            <div class="progress"><div id="vibBar" class="progress-fill"></div></div>
+        </div>
+
+        <div class="card status-card">
+            <div class="status-icon cyan">◈</div>
+            <h3>Depth Mapping</h3>
+            <div class="status-text" id="depth-status">● Tracking Active</div>
+            <img class="depth-thumb" src="{{ url_for('depth_feed') }}" alt="live depth map" />
+        </div>
+
+    </div>
+
+    <footer>VocalSense AI • Hackathon Prototype • Multimodal Silent Speech</footer>
+
+</div>
+
+<script>
+    async function pollSignals() {
+        try {
+            const res = await fetch('/signals');
+            const data = await res.json();
+
+            document.getElementById('word').innerText = data.word;
+            const confPct = Math.round(data.confidence * 100);
+            document.getElementById('confidence').innerText = confPct + '%';
+            document.getElementById('progressBar').style.width = confPct + '%';
+
+            const vibPct = Math.round(data.vibration_confidence * 100);
+            document.getElementById('vibBar').style.width = vibPct + '%';
+
+            const depthStatus = document.getElementById('depth-status');
+            if (data.obstacle_alert) {
+                depthStatus.innerText = '⚠ Object close ahead';
+                depthStatus.classList.add('alert');
+            } else {
+                depthStatus.innerText = '● Tracking Active';
+                depthStatus.classList.remove('alert');
+            }
+        } catch (err) {
+            console.error('signal poll failed', err);
+        }
+    }
+
+    setInterval(pollSignals, 200);
+    pollSignals();
+</script>
+
+</body>
+</html>

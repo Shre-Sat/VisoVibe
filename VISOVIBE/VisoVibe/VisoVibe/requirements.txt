@@ -1,0 +1,9 @@
+flask
+opencv-python
+torch
+torchvision
+timm
+sounddevice
+numpy
+mediapipe
+tensorflow
