@@ -4,7 +4,7 @@
 
 VisoVibe reads what you can't say out loud. It's a modular sensor-fusion pipeline — built from nothing but a webcam and a mic — that combines lip landmark tracking, throat vibration sensing, and monocular depth estimation into a single real-time assistive system for silent communication and spatial awareness.
 
-🏆 **3rd Place — [Hackathon Name] 2026** (Machine Learning / Accessibility track)
+🏆 **3rd Place — Cupherverse 2026** (Machine Learning / Accessibility track)
 
 ---
 
